@@ -26,8 +26,9 @@ class ReversiBot:
         Move should be a tuple (row, col) of the move you want the bot to make.
         '''
         valid_moves = state.get_valid_moves()
-        print("I move here:")
-        print(self.minimax_root(state))
+        print("I suggest moving here:")
+        move = self.minimax_root(state)
+        print(move)
         move = rand.choice(valid_moves) # Moves randomly...for now
         return move
     
@@ -199,7 +200,7 @@ class ReversiBot:
                     break
                 flipped.append(x)
 
-        # Flip Down-Right of Move
+        # Flip Up-Right of Move
         if move[0] != 0 and move[1] != 7:
             flipped = []
             for x in range(1, 8):
