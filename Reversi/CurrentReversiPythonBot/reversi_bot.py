@@ -82,12 +82,28 @@ class ReversiBot:
                     break
             return best_value
 
+    # Heuristic function to look at the board and evaluate its current value    
+    def heuristic_eval(self, state):
+        return 101
+
+    # A simple function to see who has won the game at the current leaf node
+    def get_winner(self, board):
+        myPoints = 0
+        for row in board:
+            for number in row:
+                if number == self.move_num:
+                    myPoints += 1
+
+        if(myPoints > 32):
+            # We Win
+            return myPoints * 99999
+        else:
+            # We Lose
+            return myPoints * -99999
+        
     # A simple function to give the board a move and update the pieces to look at the future   
     def get_next_state(self, state, move):
         new_board = state.board
-        print(move)
-        print(state.turn)
-        print(new_board)
         new_board[move[0],move[1]] = state.turn
 
         # Flip left right pieces
@@ -197,30 +213,12 @@ class ReversiBot:
                     break
                 flipped.append(x)
 
-        print(new_board)
         if state.turn == 2:
             new_turn = 1
         else:
             new_turn = 2
+        
+        # create next_state and return it
         next_state = reversi.ReversiGameState(new_board, new_turn)
         return next_state
-
-    # Heuristic function to look at the board and evaluate its current value    
-    def heuristic_eval(self, state):
-        return 101
-
-    # A simple function to see who has won the game at the current leaf node
-    def get_winner(self, board):
-        myPoints = 0
-        for row in board:
-            for number in row:
-                if number == self.move_num:
-                    myPoints += 1
-
-        if(myPoints > 32):
-            # We Win
-            return myPoints * 99999
-        else:
-            # We Lose
-            return myPoints * -99999
 
