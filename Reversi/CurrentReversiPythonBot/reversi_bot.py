@@ -102,8 +102,6 @@ class ReversiBot:
                     if x == state.turn:
                         for y in flipped:
                             new_board[move[0]][y] = state.turn
-                            print("right side:")
-                            print(flipped)
                         break
                     flipped.append(x)
 
@@ -116,22 +114,18 @@ class ReversiBot:
                     if new_board[move[0]][x] == state.turn:
                         for y in flipped:
                             new_board[move[0]][y] = state.turn
-                            print("left side:")
-                            print(flipped)
                         break
                     flipped.append(x)
         
         # Flip Up of Move
         if move[0] != 7:
             flipped = []
-            for x in range(move[0] + 1, 8): #C
+            for x in range(move[0] + 1, 8):
                 if new_board[x][move[1]] == 0:
                     break
                 if new_board[x][move[1]] == state.turn:
                     for y in flipped:
                         new_board[y][move[1]] = state.turn
-                        print("top side:")
-                        print(flipped)
                     break
                 flipped.append(x)
 
@@ -144,8 +138,62 @@ class ReversiBot:
                 if new_board[x][move[1]] == state.turn:
                     for y in flipped:
                         new_board[y][move[1]] = state.turn
-                        print("down side:")
-                        print(flipped)
+                    break
+                flipped.append(x)
+        
+        # Flip Up-Right of Move
+        if move[0] != 7 and move[1] != 7:
+            flipped = []
+            for x in range(1, 8):
+                if move[0] + x == 8 or move[1] + x == 8:
+                    break
+                if new_board[move[0] + x][move[1] + x] == 0:
+                    break
+                if new_board[move[0] + x][move[1] + x] == state.turn:
+                    for y in flipped:
+                        new_board[move[0] + y][move[1] + y] = state.turn
+                    break
+                flipped.append(x)
+
+        # Flip Down-Left of Move
+        if move[0] != 0 and move[1] != 0:
+            flipped = []
+            for x in range(1, 8):
+                if move[0] - x == -1 or move[1] - x == -1:
+                    break
+                if new_board[move[0] - x][move[1] - x] == 0:
+                    break
+                if new_board[move[0] - x][move[1] - x] == state.turn:
+                    for y in flipped:
+                        new_board[move[0] - y][move[1] - y] = state.turn
+                    break
+                flipped.append(x)
+        
+        # Flip Down-Right of Move
+        if move[0] != 7 and move[1] != 0:
+            flipped = []
+            for x in range(1, 8):
+                if move[0] + x == 8 or move[1] - x == -1:
+                    break
+                if new_board[move[0] + x][move[1] - x] == 0:
+                    break
+                if new_board[move[0] + x][move[1] - x] == state.turn:
+                    for y in flipped:
+                        new_board[move[0] + y][move[1] - y] = state.turn
+                    break
+                flipped.append(x)
+
+        # Flip Down-Right of Move
+        if move[0] != 0 and move[1] != 7:
+            flipped = []
+            for x in range(1, 8):
+                if move[0] - x == -1 or move[1] + x == 8:
+                    break
+                if new_board[move[0] - x][move[1] + x] == 0:
+                    break
+                if new_board[move[0] - x][move[1] + x] == state.turn:
+                    for y in flipped:
+                        new_board[move[0] - y][move[1] + y] = state.turn
                     break
                 flipped.append(x)
 
