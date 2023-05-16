@@ -40,4 +40,5 @@ For each file a java server is started on localhost and two clients are connecte
 | BotVRandom.bat  | Starts a 10 minute reversi game with a Python AI Bot as player 1 and Java Bot that plays makes moves randomly as player 2  |
 | RandomVHuman.bat  | Starts a 10 minute reversi game with a Java Bot that plays makes moves randomly as player 1 and Human as player 2  |
 | RandomVBot.bat  | Starts a 10 minute reversi game with a Java Bot that plays makes moves randomly as player 1 and Human as player 2  |
+| RandomP1Only.bat  | Starts a 10 minute reversi game with a Java Bot that plays makes moves randomly as player 1  |
 [^2]: All .bat files assume a developer has already compiled java programs in their directory. *eg. javac \*.java*
