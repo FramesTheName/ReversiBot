@@ -4,6 +4,7 @@ import socket
 import sys
 import time
 
+
 class ReversiServerConnection:
     def __init__(self, host, bot_move_num):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +22,8 @@ class ReversiServerConnection:
             return ReversiGameState(None, turn)
 
         # Flip is necessary because of the way the server does indexing
-        board = np.flip(np.array([int(x) for x in server_msg[4:68]]).reshape(8, 8), 0)
+        board = np.flip(np.array([int(x)
+                        for x in server_msg[4:68]]).reshape(8, 8), 0)
 
         return ReversiGameState(board, turn)
 
@@ -29,6 +31,7 @@ class ReversiServerConnection:
         # The 7 - bit is necessary because of the way the server does indexing
         move_str = str(7 - move[0]) + '\n' + str(move[1]) + '\n'
         self.sock.send(move_str.encode('utf-8'))
+
 
 class ReversiGame:
     def __init__(self, host, bot_move_num):
@@ -50,11 +53,12 @@ class ReversiGame:
                 move = self.bot.make_move(state)
                 self.server_conn.send_move(move)
 
+
 class ReversiGameState:
     def __init__(self, board, turn):
-        self.board_dim = 8 # Reversi is played on an 8x8 board
+        self.board_dim = 8  # Reversi is played on an 8x8 board
         self.board = board
-        self.turn = turn # Whose turn is it
+        self.turn = turn  # Whose turn is it
 
     def capture_will_occur(self, row, col, xdir, ydir, could_capture=0):
         # We shouldn't be able to leave the board
@@ -83,7 +87,7 @@ class ReversiGameState:
 
     def space_is_available(self, row, col):
         return self.space_is_on_board(row, col) and \
-               self.space_is_unoccupied(row, col)
+            self.space_is_unoccupied(row, col)
 
     def is_valid_move(self, row, col):
         if self.space_is_available(row, col):
