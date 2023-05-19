@@ -12,48 +12,16 @@ class ReversiBot:
         self.create_root(state)
         move = self.new_minimax_root(state)
         print("I suggest moving here:", move)
-        # move = rand.choice(valid_moves)  # Moves randomly...for now
         return move
 
     def create_root(self, state):
         points = self.heuristic_eval(state)
-        # instead of recalculating everything everytime, if there is a root node, then
-        # this function will go through and assign the root_node to the current state.
-        #if hasattr(self, "root_node"):
-        #   self.assign_root(self.root_node, np.array(state.board), 0)
-        #   self.traverse_tree(self.root_node)
-        #else:
         self.root_node = chip_node.Node(
             points, state.turn, state.board.copy())
         depth = 0
         valid_moves = state.get_valid_moves()
         for x in range(0, len(valid_moves)):
             self.create_tree(state, valid_moves[x], self.root_node, depth)
-
-    def assign_root(self, node, board, depth):
-        if (depth > 2):
-            return False
-
-        n_one = np.array(node.board)
-        if ((n_one == board).all()):
-            self.root_node = node
-            return True
-        else:
-            for x in range(0, len(node.children)):
-                if (self.assign_root(node.children[x], board, depth + 1)):
-                    return True
-
-    def traverse_tree(self, node):
-        if (len(node.children) == 0):
-            game_state = reversi.ReversiGameState(node.board.copy(), node.turn)
-            valid_moves = game_state.get_valid_moves()
-            if (len(valid_moves) == 0):
-                return
-            for x in range(0, len(valid_moves)):
-                self.create_tree(game_state, valid_moves[x], node, 2)
-        else:
-            for x in range(0, len(node.children)):
-                self.traverse_tree(node.children[x])
 
     def create_tree(self, state, move, node, depth):
         DEPTH_TO_SEARCH = 3
@@ -107,66 +75,6 @@ class ReversiBot:
                 if beta <= alpha:
                     break
         return points
-
-    def minimax_root(self, state):
-        valid_moves = state.get_valid_moves()
-        alpha = 0
-        beta = 0
-        best_value = -1000000
-        best_move = valid_moves[0]
-        for move in valid_moves:
-            value = self.minimax(self.get_next_state(
-                state, move), 1, False, alpha, beta)
-            best_value = max(best_value, value)
-
-            if value == best_value:
-                best_move = move
-
-            alpha = max(best_value, alpha)
-
-            if beta <= alpha:
-                break
-        return best_move
-
-    # The recursive minimax function that propagates forward the best value
-    def minimax(self, state, depth, isMaximizingPlayer, alpha, beta):
-        DEPTH_TO_SEARCH = 4
-        valid_moves = state.get_valid_moves()
-
-        # Leaf Node
-        if len(valid_moves) == 0:
-            return self.get_winner(state.board)
-
-        # Reached search limit
-        if depth > DEPTH_TO_SEARCH:
-            return self.heuristic_eval(state)
-
-        # Maximizer
-        if isMaximizingPlayer:
-            best_value = float('-inf')
-            for move in valid_moves:
-                value = self.minimax(self.get_next_state(
-                    state, move), depth + 1, False, alpha, beta)
-                best_value = max(best_value, value)
-                alpha = max(best_value, alpha)
-
-                if beta <= alpha:
-                    break
-
-            return best_value
-        # Minimizer
-        else:
-            best_value = float('inf')
-            for move in valid_moves:
-                value = self.minimax(self.get_next_state(
-                    state, move), depth + 1, True, alpha, beta)
-                best_value = min(best_value, value)
-                beta = min(beta, best_value)
-
-                if beta <= alpha:
-                    break
-
-            return best_value
 
     # Heuristic function to look at the board and evaluate its current value
     # this function will give 1 point for every chip the player has. Furthermore,
