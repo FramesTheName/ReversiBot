@@ -27,7 +27,9 @@ class ReversiBot:
 
         Move should be a tuple (row, col) of the move you want the bot to make.
         '''
+        print("creating tree")
         self.create_root(state)
+        print("minmaxing")
         move = self.new_minimax_root(state)
         print("I suggest moving here:", move)
         # move = rand.choice(valid_moves)  # Moves randomly...for now
@@ -37,16 +39,16 @@ class ReversiBot:
         points = self.heuristic_eval(state)
         # instead of recalculating everything everytime, if there is a root node, then
         # this function will go through and assign the root_node to the current state.
-        if hasattr(self, "root_node"):
-            self.assign_root(self.root_node, np.array(state.board), 0)
-            self.traverse_tree(self.root_node)
-        else:
-            self.root_node = chip_node.Node(
-                points, state.turn, state.board.copy())
-            depth = 0
-            valid_moves = state.get_valid_moves()
-            for x in range(0, len(valid_moves)):
-                self.create_tree(state, valid_moves[x], self.root_node, depth)
+        #if hasattr(self, "root_node"):
+        #   self.assign_root(self.root_node, np.array(state.board), 0)
+        #   self.traverse_tree(self.root_node)
+        #else:
+        self.root_node = chip_node.Node(
+            points, state.turn, state.board.copy())
+        depth = 0
+        valid_moves = state.get_valid_moves()
+        for x in range(0, len(valid_moves)):
+            self.create_tree(state, valid_moves[x], self.root_node, depth)
 
     def assign_root(self, node, board, depth):
         if (depth > 2):
@@ -91,20 +93,17 @@ class ReversiBot:
 
     def new_minimax_root(self, state):
         valid_moves = state.get_valid_moves()
-        print('validMoves: ', valid_moves)
-
         best_points = 0
         best_move = valid_moves[0]
         for n in range(0, len(self.root_node.children)):
-            points = self.new_minimax(self.root_node.children[n], True)
+            points = self.new_minimax(self.root_node.children[n], True, 0, 0)
             if (points > best_points):
                 best_points = points
                 best_move = self.root_node.children[n].move
 
         return best_move
 
-    def new_minimax(self, node, isMaximizingPlayer):
-        print('new_minimax')
+    def new_minimax(self, node, isMaximizingPlayer, alpha, beta):
 
         # if there are no more valid moves, then return if the person is the winner.
         if len(node.children) == 0:
@@ -114,19 +113,25 @@ class ReversiBot:
             # impliment the beta pruning here
             points = -1000
             for n in range(0, len(node.children)):
-                points = max(points, self.new_minimax(node.children[n], False))
+                points = max(points, self.new_minimax(node.children[n], False, alpha, beta))
                 print(points)
+                alpha = max(points, alpha)
+                if beta <= alpha:
+                    break
+                
         else:
             # impliment the beta pruning here
             points = 1000
             for n in range(0, len(node.children)):
-                points = min(points, self.new_minimax(node.children[n], True))
+                points = min(points, self.new_minimax(node.children[n], True, alpha, beta))
                 print(points)
+                beta = min(beta, points)
+                if beta <= alpha:
+                    break
         return points
 
     def minimax_root(self, state):
         valid_moves = state.get_valid_moves()
-        print('validMoves: ', valid_moves)
         alpha = 0
         beta = 0
         best_value = -1000000
