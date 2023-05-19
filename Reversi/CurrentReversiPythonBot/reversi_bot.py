@@ -14,6 +14,31 @@ class ReversiBot:
         print("I suggest moving here:", move)
         return move
 
+    def assign_root(self, node, board, depth):
+        if (depth > 2):
+            return False
+
+        n_one = np.array(node.board)
+        if ((n_one == board).all()):
+            self.root_node = node
+            return True
+        else:
+            for x in range(0, len(node.children)):
+                if (self.assign_root(node.children[x], board, depth + 1)):
+                    return True
+
+    def traverse_tree(self, node):
+        if (len(node.children) == 0):
+            game_state = reversi.ReversiGameState(node.board.copy(), node.turn)
+            valid_moves = game_state.get_valid_moves()
+            if (len(valid_moves) == 0):
+                return
+            for x in range(0, len(valid_moves)):
+                self.create_tree(game_state, valid_moves[x], node, 2)
+        else:
+            for x in range(0, len(node.children)):
+                self.traverse_tree(node.children[x])
+
     def create_root(self, state):
         points = self.heuristic_eval(state)
         self.root_node = chip_node.Node(
@@ -44,7 +69,8 @@ class ReversiBot:
         best_points = 0
         best_move = valid_moves[0]
         for n in range(0, len(self.root_node.children)):
-            points = self.new_minimax(self.root_node.children[n], True, float('inf'), float('-inf'))
+            points = self.new_minimax(
+                self.root_node.children[n], True, float('inf'), float('-inf'))
             if (points > best_points):
                 best_points = points
                 best_move = self.root_node.children[n].move
@@ -61,16 +87,18 @@ class ReversiBot:
             # impliment the beta pruning here
             points = -1000
             for n in range(0, len(node.children)):
-                points = max(points, self.new_minimax(node.children[n], False, alpha, beta))
+                points = max(points, self.new_minimax(
+                    node.children[n], False, alpha, beta))
                 alpha = max(points, alpha)
                 if beta <= alpha:
                     break
-                
+
         else:
             # impliment the beta pruning here
             points = 1000
             for n in range(0, len(node.children)):
-                points = min(points, self.new_minimax(node.children[n], True, alpha, beta))
+                points = min(points, self.new_minimax(
+                    node.children[n], True, alpha, beta))
                 beta = min(beta, points)
                 if beta <= alpha:
                     break
