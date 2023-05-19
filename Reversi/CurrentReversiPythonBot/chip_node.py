@@ -16,3 +16,10 @@ class Node:
         if len(self.children) > index:
             return None
         return self.children[index]
+
+    def get_depth(self, depth=0):
+        depth += 1
+        if (len(self.children) != 0):
+            return self.children[0].get_depth(depth)
+        else:
+            return depth

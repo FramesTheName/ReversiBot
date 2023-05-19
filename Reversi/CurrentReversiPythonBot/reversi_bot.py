@@ -12,20 +12,34 @@ class ReversiBot:
         self.create_root(state)
         move = self.new_minimax_root(state)
         print("I suggest moving here:", move)
+        for x in range(0, len(self.root_node.children)):
+            if (move == self.root_node.children[x].move):
+                self.root_node = self.root_node.children[x]
+                break
         return move
 
-    def assign_root(self, node, board, depth):
-        if (depth > 2):
-            return False
-
-        n_one = np.array(node.board)
-        if ((n_one == board).all()):
-            self.root_node = node
-            return True
+    def create_root(self, state):
+        if hasattr(self, "root_node"):
+            move = self.assign_root(self.root_node.board, state.board)
+            for x in range(0, len(self.root_node.children)):
+                if (move == self.root_node.children[x].move):
+                    self.root_node = self.root_node.children[x]
+                    break
+            self.traverse_tree(self.root_node)
         else:
-            for x in range(0, len(node.children)):
-                if (self.assign_root(node.children[x], board, depth + 1)):
-                    return True
+            points = self.heuristic_eval(state)
+            self.root_node = chip_node.Node(
+                points, state.turn, state.board.copy())
+            depth = 0
+            valid_moves = state.get_valid_moves()
+            for x in range(0, len(valid_moves)):
+                self.create_tree(state, valid_moves[x], self.root_node, depth)
+
+    def assign_root(self, previous_board, current_board):
+        for x in range(0, 8):
+            for y in range(0, 8):
+                if (previous_board[x][y] == 0 and current_board[x][y] != 0):
+                    return (x, y)
 
     def traverse_tree(self, node):
         if (len(node.children) == 0):
@@ -33,20 +47,12 @@ class ReversiBot:
             valid_moves = game_state.get_valid_moves()
             if (len(valid_moves) == 0):
                 return
+            depth = self.root_node.get_depth()
             for x in range(0, len(valid_moves)):
-                self.create_tree(game_state, valid_moves[x], node, 2)
+                self.create_tree(game_state, valid_moves[x], node, depth - 1)
         else:
             for x in range(0, len(node.children)):
                 self.traverse_tree(node.children[x])
-
-    def create_root(self, state):
-        points = self.heuristic_eval(state)
-        self.root_node = chip_node.Node(
-            points, state.turn, state.board.copy())
-        depth = 0
-        valid_moves = state.get_valid_moves()
-        for x in range(0, len(valid_moves)):
-            self.create_tree(state, valid_moves[x], self.root_node, depth)
 
     def create_tree(self, state, move, node, depth):
         DEPTH_TO_SEARCH = 3
