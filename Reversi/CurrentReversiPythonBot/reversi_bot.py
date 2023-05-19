@@ -96,7 +96,7 @@ class ReversiBot:
         best_points = 0
         best_move = valid_moves[0]
         for n in range(0, len(self.root_node.children)):
-            points = self.new_minimax(self.root_node.children[n], True, 0, 0)
+            points = self.new_minimax(self.root_node.children[n], True, float('inf'), float('-inf'))
             if (points > best_points):
                 best_points = points
                 best_move = self.root_node.children[n].move
@@ -194,17 +194,20 @@ class ReversiBot:
     # this function will give 1 point for every chip the player has. Furthermore,
     # it will give an extra 5 points for every edge piece the player has and 10 points for a corner piece.
     def heuristic_eval(self, state):
-        points = 0
+        values = [
+            [120, -20,  20,   5,   5,  20, -20, 120],
+            [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
+            [20,  -5,  15,   3,   3,  15,  -5,  20],
+            [5,  -5,   3,   3,   3,   3,  -5,   5],
+            [5,  -5,   3,   3,   3,   3,  -5,   5],
+            [20,  -5,  15,   3,   3,  15,  -5,  20],
+            [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
+            [120, -20,  20,   5,   5,  20, -20, 120]
+        ]
         for x in range(0, 8):
             for y in range(0, 8):
-                if (x == 0 or x == 7):
-                    if (state.board[x][y] == state.turn):
-                        points += 5
-                elif (y == 0 or y == 7):
-                    if (state.board[x][y] == state.turn):
-                        points += 5
                 if (state.board[x][y] == state.turn):
-                    points += 1
+                    points += values[x][y]
         return points
 
     # A simple function to see who has won the game at the current leaf node
