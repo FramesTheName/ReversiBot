@@ -5,6 +5,9 @@ import chip_node
 
 
 class ReversiBot:
+    global DEPTH_TO_SEARCH
+    DEPTH_TO_SEARCH = 3
+
     def __init__(self, move_num):
         self.move_num = move_num
 
@@ -25,7 +28,7 @@ class ReversiBot:
                 if (move == self.root_node.children[x].move):
                     self.root_node = self.root_node.children[x]
                     break
-            self.traverse_tree(self.root_node)
+            self.traverse_tree(self.root_node, self.root_node.get_depth())
         else:
             points = self.heuristic_eval(state)
             self.root_node = chip_node.Node(
@@ -41,21 +44,22 @@ class ReversiBot:
                 if (previous_board[x][y] == 0 and current_board[x][y] != 0):
                     return (x, y)
 
-    def traverse_tree(self, node):
+    def traverse_tree(self, node, depth):
+        if depth > DEPTH_TO_SEARCH:
+            return None
         if (len(node.children) == 0):
             game_state = reversi.ReversiGameState(node.board.copy(), node.turn)
             valid_moves = game_state.get_valid_moves()
             if (len(valid_moves) == 0):
                 return
-            depth = self.root_node.get_depth()
             for x in range(0, len(valid_moves)):
                 self.create_tree(game_state, valid_moves[x], node, depth - 1)
         else:
             for x in range(0, len(node.children)):
-                self.traverse_tree(node.children[x])
+                self.traverse_tree(node.children[x], depth)
 
     def create_tree(self, state, move, node, depth):
-        DEPTH_TO_SEARCH = 3
+
         if depth > DEPTH_TO_SEARCH:
             return None
         node_state = self.get_next_state(state, move)
