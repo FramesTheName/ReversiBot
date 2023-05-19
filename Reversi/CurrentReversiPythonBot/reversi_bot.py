@@ -59,12 +59,14 @@ class ReversiBot:
                 self.traverse_tree(node.children[x], depth)
 
     def create_tree(self, state, move, node, depth):
-
         if depth > DEPTH_TO_SEARCH:
             return None
         node_state = self.get_next_state(state, move)
         valid_moves = node_state.get_valid_moves()
-        points = self.heuristic_eval(node_state)
+        if(len(valid_moves) != 0):
+            points = self.heuristic_eval(node_state)
+        else:
+            points = self.get_winner(node_state.board)
         child_node = chip_node.Node(
             points, node_state.turn, node_state.board.copy(), move)
         node.insert_child(child_node)
@@ -131,8 +133,12 @@ class ReversiBot:
         ]
         for x in range(0, 7):
             for y in range(0, 7):
-                if (state.board[x][y] == state.turn):
+                if (state.board[x][y] == self.turn):
                     points += values[x][y]
+                elif state.board[x][y] == 0:
+                    points += 0
+                else:
+                    points -= values[x][y]
         return points
 
     # A simple function to see who has won the game at the current leaf node
@@ -145,10 +151,10 @@ class ReversiBot:
 
         if (myPoints > 32):
             # We Win
-            return 1000
+            return 100000
         else:
             # We Lose
-            return -1000
+            return -100000
 
     # A simple function to give the board a move and update the pieces to look at the future
     def get_next_state(self, state, move):
