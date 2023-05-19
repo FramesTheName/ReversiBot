@@ -7,51 +7,29 @@ class ReversiBot:
         self.move_num = move_num
 
     def make_move(self, state):
-        '''
-        This is the only function that needs to be implemented for the lab!
-        The bot should take a game state and return a move.
-
-        The parameter "state" is of type ReversiGameState and has two useful
-        member variables. The first is "board", which is an 8x8 numpy array
-        of 0s, 1s, and 2s. If a spot has a 0 that means it is unoccupied. If
-        there is a 1 that means the spot has one of player 1's stones. If
-        there is a 2 on the spot that means that spot has one of player 2's
-        stones. The other useful member variable is "turn", which is 1 if it's
-        player 1's turn and 2 if it's player 2's turn.
-
-        ReversiGameState objects have a nice method called get_valid_moves.
-        When you invoke it on a ReversiGameState object a list of valid
-        moves for that state is returned in the form of a list of tuples.
-
-        Move should be a tuple (row, col) of the move you want the bot to make.
-        '''
-        valid_moves = state.get_valid_moves()
         print("I suggest moving here:")
         move = self.minimax_root(state)
         print(move)
-        move = rand.choice(valid_moves) # Moves randomly...for now
         return move
     
     # First minimax run keeps track of the best move
     def minimax_root(self, state):
         valid_moves = state.get_valid_moves()
-        alpha = 0
-        beta = 0
-        best_value = -1000000
+        alpha = float('-inf')
+        beta = float('inf')
+        best_value = float('-inf')
         best_move = valid_moves[0]
         for move in valid_moves:
             value = self.minimax(self.get_next_state(state, move), 1, False, alpha, beta)
             best_value = max(best_value, value)
+            alpha = max(value, alpha)
             if value == best_value:
                 best_move = move
-            alpha = max(best_value, alpha)
-            if beta <= alpha:
-                break
         return best_move
     
     # The recursive minimax function that propagates forward the best value
     def minimax(self, state, depth, isMaximizingPlayer, alpha, beta):
-        DEPTH_TO_SEARCH = 4
+        DEPTH_TO_SEARCH = 20
         valid_moves = state.get_valid_moves()
 
         # Leaf Node
@@ -59,7 +37,7 @@ class ReversiBot:
             return self.get_winner(state.board)
         
         # Reached search limit
-        if depth > DEPTH_TO_SEARCH: 
+        if depth > DEPTH_TO_SEARCH:
             return self.heuristic_eval(state)
         
         # Maximizer
@@ -68,24 +46,40 @@ class ReversiBot:
             for move in valid_moves:
                 value = self.minimax(self.get_next_state(state, move), depth+1, False, alpha, beta)
                 best_value = max( best_value, value)
-                alpha = max(best_value, alpha)
+                alpha = max(value, alpha)
                 if beta <= alpha:
                     break
             return best_value
         # Minimizer
         else :
-            best_value = float('inf')
+            worst_value = float('inf')
             for move in valid_moves :
                 value = self.minimax(self.get_next_state(state, move), depth+1, True, alpha, beta)
-                best_value = min( best_value, value) 
-                beta = min( beta, best_value)
+                worst_value = min( worst_value, value)
+                beta = min( beta, value) 
                 if beta <= alpha:
                     break
-            return best_value
+            return worst_value
 
     # Heuristic function to look at the board and evaluate its current value    
     def heuristic_eval(self, state):
-        return 101
+        print("heuristic eval")
+        points = 0
+        values = [
+            [120, -20,  20,   5,   5,  20, -20, 120],
+            [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
+            [20,  -5,  15,   3,   3,  15,  -5,  20],
+            [5,  -5,   3,   3,   3,   3,  -5,   5],
+            [5,  -5,   3,   3,   3,   3,  -5,   5],
+            [20,  -5,  15,   3,   3,  15,  -5,  20],
+            [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
+            [120, -20,  20,   5,   5,  20, -20, 120]
+        ]
+        for x in range(0, 7):
+            for y in range(0, 7):
+                if (state.board[x][y] == self.move_num):
+                    points += values[x][y]
+        return points
 
     # A simple function to see who has won the game at the current leaf node
     def get_winner(self, board):
@@ -97,10 +91,10 @@ class ReversiBot:
 
         if(myPoints > 32):
             # We Win
-            return myPoints * 99999
+            return myPoints * 10
         else:
             # We Lose
-            return myPoints * -99999
+            return myPoints * -10
         
     # A simple function to give the board a move and update the pieces to look at the future   
     def get_next_state(self, state, move):
