@@ -37,6 +37,7 @@ class ReversiGame:
     def __init__(self, host, bot_move_num):
         self.bot_move_num = bot_move_num
         self.server_conn = ReversiServerConnection(host, bot_move_num)
+        print("ReversiGame")
         self.bot = reversi_bot.ReversiBot(bot_move_num)
 
     def play(self):

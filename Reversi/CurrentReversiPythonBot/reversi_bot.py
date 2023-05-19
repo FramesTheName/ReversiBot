@@ -9,27 +9,7 @@ class ReversiBot:
         self.move_num = move_num
 
     def make_move(self, state):
-        '''
-        This is the only function that needs to be implemented for the lab!
-        The bot should take a game state and return a move.
-
-        The parameter "state" is of type ReversiGameState and has two useful
-        member variables. The first is "board", which is an 8x8 numpy array
-        of 0s, 1s, and 2s. If a spot has a 0 that means it is unoccupied. If
-        there is a 1 that means the spot has one of player 1's stones. If
-        there is a 2 on the spot that means that spot has one of player 2's
-        stones. The other useful member variable is "turn", which is 1 if it's
-        player 1's turn and 2 if it's player 2's turn.
-
-        ReversiGameState objects have a nice method called get_valid_moves.
-        When you invoke it on a ReversiGameState object a list of valid
-        moves for that state is returned in the form of a list of tuples.
-
-        Move should be a tuple (row, col) of the move you want the bot to make.
-        '''
-        print("creating tree")
         self.create_root(state)
-        print("minmaxing")
         move = self.new_minimax_root(state)
         print("I suggest moving here:", move)
         # move = rand.choice(valid_moves)  # Moves randomly...for now
@@ -114,7 +94,6 @@ class ReversiBot:
             points = -1000
             for n in range(0, len(node.children)):
                 points = max(points, self.new_minimax(node.children[n], False, alpha, beta))
-                print(points)
                 alpha = max(points, alpha)
                 if beta <= alpha:
                     break
@@ -124,7 +103,6 @@ class ReversiBot:
             points = 1000
             for n in range(0, len(node.children)):
                 points = min(points, self.new_minimax(node.children[n], True, alpha, beta))
-                print(points)
                 beta = min(beta, points)
                 if beta <= alpha:
                     break
@@ -194,6 +172,7 @@ class ReversiBot:
     # this function will give 1 point for every chip the player has. Furthermore,
     # it will give an extra 5 points for every edge piece the player has and 10 points for a corner piece.
     def heuristic_eval(self, state):
+        points = 0
         values = [
             [120, -20,  20,   5,   5,  20, -20, 120],
             [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
@@ -204,8 +183,8 @@ class ReversiBot:
             [-20, -40,  -5,  -5,  -5,  -5, -40, -20],
             [120, -20,  20,   5,   5,  20, -20, 120]
         ]
-        for x in range(0, 8):
-            for y in range(0, 8):
+        for x in range(0, 7):
+            for y in range(0, 7):
                 if (state.board[x][y] == state.turn):
                     points += values[x][y]
         return points
