@@ -12,6 +12,17 @@ class ReversiBot:
         self.move_num = move_num
 
     def make_move(self, state):
+        valid_moves = state.get_valid_moves()
+        if len(valid_moves) >= 7:
+            DEPTH_TO_SEARCH = 2
+        elif len(valid_moves) >= 4:
+            DEPTH_TO_SEARCH = 3
+        elif len(valid_moves) >= 2:
+            DEPTH_TO_SEARCH = 3
+        else:
+            DEPTH_TO_SEARCH = 4
+
+           
         self.create_root(state)
         move = self.new_minimax_root(state)
         print("I suggest moving here:", move)
@@ -63,16 +74,29 @@ class ReversiBot:
             return None
         node_state = self.get_next_state(state, move)
         valid_moves = node_state.get_valid_moves()
+
         if(len(valid_moves) != 0):
             points = self.heuristic_eval(node_state)
-        else:
+        elif(self.is_leaf_node(node_state)):
             points = self.get_winner(node_state.board)
+        else:
+            node_state = self.change_turn(node_state)
+            points = self.heuristic_eval(node_state)
+
         child_node = chip_node.Node(
             points, node_state.turn, node_state.board.copy(), move)
         node.insert_child(child_node)
 
         for x in range(0, len(valid_moves)):
             self.create_tree(node_state, valid_moves[x], child_node, depth + 1)
+
+    # A function that returns true if the board is in a leaf node
+    def is_leaf_node(self, state):
+        for row in state.board:
+            if 0 in row:
+                return False
+        return True
+    
 
     # First minimax run keeps track of the best move
 
@@ -133,7 +157,7 @@ class ReversiBot:
         ]
         for x in range(0, 7):
             for y in range(0, 7):
-                if (state.board[x][y] == self.turn):
+                if (state.board[x][y] == self.move_num):
                     points += values[x][y]
                 elif state.board[x][y] == 0:
                     points += 0
@@ -155,6 +179,14 @@ class ReversiBot:
         else:
             # We Lose
             return -100000
+
+    #A function that changes whose turn it is
+    def change_turn(self, state):
+        if state.turn == 2:
+            new_turn = 1
+        else:
+            new_turn = 2
+        return reversi.ReversiGame(state.board, new_turn)
 
     # A simple function to give the board a move and update the pieces to look at the future
     def get_next_state(self, state, move):
