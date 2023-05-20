@@ -63,10 +63,10 @@ class ReversiBot:
             valid_moves = game_state.get_valid_moves()
             if (len(valid_moves) == 0):
                 return
-            for x in range(0, len(valid_moves)):
-                if (game_state.is_valid_move(valid_moves[x][0], valid_moves[x][1])):
-                    self.create_tree(
-                        game_state, valid_moves[x], node, depth - 1)
+        for x in range(0, len(valid_moves)):
+            if (game_state.is_valid_move(valid_moves[x][0], valid_moves[x][1])):
+                self.create_tree(
+                    game_state, valid_moves[x], node, depth - 1)
         else:
             for x in range(0, len(node.children)):
                 self.traverse_tree(node.children[x], depth)
