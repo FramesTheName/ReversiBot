@@ -14,13 +14,13 @@ class ReversiBot:
     def make_move(self, state):
         valid_moves = state.get_valid_moves()
         if len(valid_moves) >= 7:
-            DEPTH_TO_SEARCH = 2
-        elif len(valid_moves) >= 4:
-            DEPTH_TO_SEARCH = 3
-        elif len(valid_moves) >= 2:
-            DEPTH_TO_SEARCH = 3
-        else:
             DEPTH_TO_SEARCH = 4
+        elif len(valid_moves) >= 4:
+            DEPTH_TO_SEARCH = 6
+        elif len(valid_moves) >= 2:
+            DEPTH_TO_SEARCH = 6
+        else:
+            DEPTH_TO_SEARCH = 8
 
         self.create_root(state)
         move = self.new_minimax_root(state)
@@ -82,12 +82,14 @@ class ReversiBot:
         else:
             points = self.get_winner(node_state.board)
 
-        child_node = chip_node.Node(
-            points, node_state.turn, node_state.board.copy(), move)
-        node.insert_child(child_node)
+        if (node_state.is_valid_move(move[0], move[1])):
+            child_node = chip_node.Node(
+                points, node_state.turn, node_state.board.copy(), move)
+            node.insert_child(child_node)
 
-        for x in range(0, len(valid_moves)):
-            self.create_tree(node_state, valid_moves[x], child_node, depth + 1)
+            for x in range(0, len(valid_moves)):
+                self.create_tree(
+                    node_state, valid_moves[x], child_node, depth + 1)
 
     # A function that returns true if the board is in a leaf node
     def is_leaf_node(self, state):
