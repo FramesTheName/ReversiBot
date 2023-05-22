@@ -14,32 +14,47 @@ class ReversiBot:
     def make_move(self, state):
         valid_moves = state.get_valid_moves()
         if len(valid_moves) >= 7:
-            DEPTH_TO_SEARCH = 4
+            DEPTH_TO_SEARCH = 1
         elif len(valid_moves) >= 4:
-            DEPTH_TO_SEARCH = 6
+            DEPTH_TO_SEARCH = 2
         elif len(valid_moves) >= 2:
-            DEPTH_TO_SEARCH = 6
+            DEPTH_TO_SEARCH = 3
         else:
-            DEPTH_TO_SEARCH = 8
+            DEPTH_TO_SEARCH = 4
 
+        #Builds out our tree
         self.create_root(state)
+
+        #Calculates best move
         move = self.new_minimax_root(state)
         print(state.board)
         print("I suggest moving here:", move)
+
+        #Changes root node
         for x in range(0, len(self.root_node.children)):
             if (move == self.root_node.children[x].move):
                 self.root_node = self.root_node.children[x]
                 break
+        
+        #Send move
         return move
 
+    #Starts building our searchable tree
     def create_root(self, state):
+
+        #If a root node already existed (i.e. a best move?)
         if hasattr(self, "root_node"):
             move = self.assign_root(self.root_node.board, state.board)
+
             for x in range(0, len(self.root_node.children)):
                 if (move == self.root_node.children[x].move):
                     self.root_node = self.root_node.children[x]
                     break
+            
+            #Create tree at current root node plus the depth neccessary
             self.traverse_tree(self.root_node, self.root_node.get_depth())
+
+        #If a root node does not exist create a new node
         else:
             points = self.heuristic_eval(state)
             self.root_node = chip_node.Node(
@@ -56,40 +71,52 @@ class ReversiBot:
                     return (x, y)
 
     def traverse_tree(self, node, depth):
+
+        #If I have made it to the required depth to search
         if depth > DEPTH_TO_SEARCH:
             return None
+        
+        #If I have no children in the tree
         if (len(node.children) == 0):
             game_state = reversi.ReversiGameState(node.board.copy(), node.turn)
             valid_moves = game_state.get_valid_moves()
+
+            #Make sure I have valid moves (Not a leaf node)
             if (len(valid_moves) == 0):
                 return
-        for x in range(0, len(valid_moves)):
-            if (game_state.is_valid_move(valid_moves[x][0], valid_moves[x][1])):
-                self.create_tree(
-                    game_state, valid_moves[x], node, depth - 1)
+        
+            #Continue tree propigation
+            for x in range(0, len(valid_moves)):
+                self.create_tree(game_state, valid_moves[x], node, depth - 1)
+        
+        #Keep searching children nodes        
         else:
             for x in range(0, len(node.children)):
                 self.traverse_tree(node.children[x], depth)
 
+    
     def create_tree(self, state, move, node, depth):
+        #Make sure I do not go too deep
         if depth > DEPTH_TO_SEARCH:
             return None
+        
         node_state = self.get_next_state(state, move)
         valid_moves = node_state.get_valid_moves()
 
+        #Check for child nodes
         if (len(valid_moves) != 0):
             points = self.heuristic_eval(node_state)
         else:
             points = self.get_winner(node_state.board)
+        
+        #Make me a child node
+        print("Made child at depth ", depth)
+        child_node = chip_node.Node(points, node_state.turn, node_state.board.copy(), move)
+        node.insert_child(child_node)
 
-        if (node_state.is_valid_move(move[0], move[1])):
-            child_node = chip_node.Node(
-                points, node_state.turn, node_state.board.copy(), move)
-            node.insert_child(child_node)
-
-            for x in range(0, len(valid_moves)):
-                self.create_tree(
-                    node_state, valid_moves[x], child_node, depth + 1)
+        #Propigate my children ndoes
+        for x in range(0, len(valid_moves)):
+            self.create_tree(node_state, valid_moves[x], child_node, depth + 1)
 
     # A function that returns true if the board is in a leaf node
     def is_leaf_node(self, state):

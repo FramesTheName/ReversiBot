@@ -17,6 +17,7 @@ class Node:
             return None
         return self.children[index]
 
+    #returns how deep children have been propigated
     def get_depth(self, depth=0):
         depth += 1
         if (len(self.children) != 0):
