@@ -110,7 +110,6 @@ class ReversiBot:
             points = self.get_winner(node_state.board)
         
         #Make me a child node
-        print("Made child at depth ", depth)
         child_node = chip_node.Node(points, node_state.turn, node_state.board.copy(), move)
         node.insert_child(child_node)
 
